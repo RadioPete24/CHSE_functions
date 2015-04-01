@@ -23,7 +23,7 @@ scheduleBatch<-function(batch=NULL,time=NULL,date=NULL,name=NULL,inbatchfunc=FAL
       }
     
       #Check if batch file is in correct format#
-      if(!(substr(batch,nchar(batch)-2,nchar(batch)) %in% c("bat","Bat","BAT"))){
+      if(!(grepl(".[Bb][Aa][Tt]$", batch))){
         stop("Batch file must be in (.bat) format")
       }
       
@@ -88,7 +88,7 @@ scheduleBatch<-function(batch=NULL,time=NULL,date=NULL,name=NULL,inbatchfunc=FAL
   schedprompt <- paste("schtasks /create /tn ",
                        name,
                        " /tr ",
-                       batch,
+                       paste('"',batch,'"',sep=""),
                        " /sc once /st ",
                        time,
                        " /sd ",
@@ -150,7 +150,7 @@ batch.RMD <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE){
   }
   
   #Checks to make sure file is RMarkdown format
-  if(!(substr(file,nchar(file)-2,nchar(file)) %in% c("rmd","Rmd","RMD"))){
+  if(!(grepl(".[Rr][Mm][Dd]$", file))){
     stop("File must be in RMarkdown format")
   }
   
@@ -215,7 +215,7 @@ batch.RMD <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE){
   
   #Create Batch File#
   
-  writeLines(paste(RPath, KnitProg, file),batchFile)
+  writeLines(paste(RPath, KnitProg, paste('"',file,'"', sep="")),batchFile)
   message(paste(" Batch file created at:\n",batchFile,"\n"))
   
   ########################
@@ -278,7 +278,7 @@ batch.R <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE){
   }
   
   #Checks to make sure file is R program format#
-  if(!(substr(file,nchar(file),nchar(file)) %in% c("r","R"))){
+  if(!(grepl(".[Rr]$",file))){
     stop("File must be in R program format (.R)")
   }
   
@@ -340,7 +340,7 @@ batch.R <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE){
   
   #Create Batch File#
   
-  writeLines(paste(RPath, file),batchFile)
+  writeLines(paste(RPath, paste('"',file,'"', sep="")),batchFile)
   message(paste(" Batch file created at:\n",batchFile,"\n"))
   
   ########################
@@ -362,9 +362,6 @@ batch.R <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE){
 batch <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE,view=TRUE){
   
   #Check file type#
-  
-  Rext      <-  c("R","r")
-  RMDext    <-  c("RMD","Rmd","rmd")
   indicator <-  0
   
   
@@ -376,13 +373,13 @@ batch <- function(file=NULL,time=NULL,date=NULL,name=NULL,autosched=TRUE,view=TR
       if(file.exists("E:/Share/Other/BatchUsage/userID.R")){source("E:/Share/Other/BatchUsage/userID.R")}
     
       #Check if R file
-      if(substr(file,nchar(file),nchar(file)) %in% Rext){
+      if(grepl(".[Rr]$",file)){
         batch.R(file=file,time=time,date=date,name=name,autosched=autosched)
         indicator <- indicator + 1
       }
       
       #Check if RMD file
-      if(substr(file,nchar(file)-2,nchar(file)) %in% RMDext){
+      if(grepl(".[Rr][Mm][Dd]$",file)){
         batch.RMD(file=file,time=time,date=date,name=name,autosched=autosched)
         indicator <- indicator + 1
       }
